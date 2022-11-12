@@ -6,15 +6,12 @@
 
 int main()
 {
-    ITYPE n = 30;
-    ITYPE loop = 100000;
-    //loop = 1;
-    //std::cin >> n;
+    int n = 30;
     QuantumState state(n);
     clock_t start, end;
     double time;
 
-    state.act_H(0);
+    state.act_H(0);   
 
     start = clock();
     state.act_H(10);
