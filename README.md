@@ -8,6 +8,6 @@ g++ main.cpp
 
 GPU版
 ```
-nvcc main.cpp
+nvcc main.cu
 ```
 CPU版もGPU版も外部モジュールは用いていません。
