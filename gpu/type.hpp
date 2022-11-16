@@ -11,15 +11,21 @@ std::complex<double> omega2 = omega*omega;
 std::complex<double> omega3 = omega*omega*omega;
 
 ////////////////////////////////////////////////////////////////////////////////
-// ωによる4次体の整数環 Z[ω]　     ω=exp(iπ/4)
-// CUDAのBuilt-inのベクトル型を使う　
+// ωによる4次体の整数環 Z[ω]　     ω=exp(iπ/4)　　
 ////////////////////////////////////////////////////////////////////////////////
+//struct ZOmega
+//{
+//    ITYPE x;    // xω^3 + yω^2 + zω + w   
+//    ITYPE y;
+//    ITYPE z;
+//    ITYPE w;
+//};
 typedef int4 ZOmega;
 
 ////////////////////////////////////////////////////////////////////////////////
 // std::complex<double>型に変換
 ////////////////////////////////////////////////////////////////////////////////
-std::complex<double> convert(ZOmega a)
+inline std::complex<double> convert(ZOmega a)
 {
     return (double)a.x*omega3 + (double)a.y*omega2 + (double)a.z*omega + (double)a.w;
 }
@@ -27,7 +33,7 @@ std::complex<double> convert(ZOmega a)
 ////////////////////////////////////////////////////////////////////////////////
 // a*iを計算        (iは虚数単位)
 ////////////////////////////////////////////////////////////////////////////////
-ZOmega multiple_i(ZOmega a)
+inline ZOmega __host__ __device__ multiple_i(ZOmega a)
 {
     return make_ZOmega(-a.z, -a.w, a.x, a.y);
 }
@@ -35,7 +41,7 @@ ZOmega multiple_i(ZOmega a)
 ////////////////////////////////////////////////////////////////////////////////
 // a*ωを計算        (ω=exp(iπ/4))
 ////////////////////////////////////////////////////////////////////////////////
-ZOmega multiple_omega(ZOmega a)
+inline ZOmega __host__ __device__ multiple_omega(ZOmega a)
 {
     return make_ZOmega(a.y, a.z, a.w, -a.x);
 }
@@ -43,17 +49,17 @@ ZOmega multiple_omega(ZOmega a)
 ////////////////////////////////////////////////////////////////////////////////
 // 各演算子をオーバーライド
 ////////////////////////////////////////////////////////////////////////////////
-inline ZOmega operator-(ZOmega &a)
+inline ZOmega __host__ __device__ operator-(ZOmega &a)
 {
     return make_ZOmega(-a.x, -a.y, -a.z, -a.w);
 }
 
-inline ZOmega operator+(ZOmega a, ZOmega b)
+inline ZOmega __host__ __device__ operator+(ZOmega a, ZOmega b)
 {
     return make_ZOmega(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
 }
 
-inline void operator+=(ZOmega &a, ZOmega b)
+inline void __host__ __device__ operator+=(ZOmega &a, ZOmega b)
 {
     a.x += b.x;
     a.y += b.y;
@@ -61,12 +67,12 @@ inline void operator+=(ZOmega &a, ZOmega b)
     a.w += b.w;
 }
 
-inline ZOmega operator-(ZOmega a, ZOmega b)
+inline ZOmega __host__ __device__ operator-(ZOmega a, ZOmega b)
 {
     return make_ZOmega(a.x - b.x, a.y - b.y, a.z - b.y, a.w - b.w);
 }
 
-inline void operator-=(ZOmega &a, ZOmega b)
+inline void __host__ __device__ operator-=(ZOmega &a, ZOmega b)
 {
     a.x -= b.x;
     a.y -= b.y;
@@ -74,7 +80,7 @@ inline void operator-=(ZOmega &a, ZOmega b)
     a.w -= b.w;
 }
 
-inline ZOmega operator*(ZOmega a, ZOmega b)
+inline ZOmega __host__ __device__ operator*(ZOmega a, ZOmega b)
 {
     return make_ZOmega(a.x*b.w + a.y*b.z + a.z*b.y + a.w*b.x,
                          -a.x*b.x + a.y*b.w + a.z*b.z + a.w*b.y,
@@ -82,7 +88,7 @@ inline ZOmega operator*(ZOmega a, ZOmega b)
                          -a.x*b.z - a.y*b.y - a.z*b.x + a.w*b.w);
 }
 
-inline void operator*=(ZOmega &a, ZOmega b)
+inline void __host__ __device__ operator*=(ZOmega &a, ZOmega b)
 {
     ITYPE tmp_x = a.x;
     ITYPE tmp_y = a.y;
@@ -99,3 +105,8 @@ std::ostream& operator<<(std::ostream& os, ZOmega &a)
     os << a.x << "ω^3 + " << a.y << "ω^2 + " << a.z << "ω + " << a.w;
     return os;
 }
+
+//inline ZOmega __host__ __device__ operator*(ZOmega a, int b)
+//{
+//    return make_ZOmega(a.x * b, a.y * b, a.z * b, a.w * b);
+//}
