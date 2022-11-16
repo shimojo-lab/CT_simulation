@@ -3,11 +3,11 @@
 ## コンパイラ方法  
 CPU版
 ```
-g++ main.cpp
+g++ -O3 main.cpp
 ```
 
 GPU版
 ```
-nvcc main.cu
+nvcc -O3 main.cu
 ```
 CPU版もGPU版も外部モジュールは用いていません。
